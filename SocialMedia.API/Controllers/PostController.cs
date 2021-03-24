@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SocialMedia.Core.DTOs;
+using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
 
 namespace SocialMedia.API.Controllers
@@ -20,9 +22,46 @@ namespace SocialMedia.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPost()
+        public async Task<IActionResult> GetPosts()
         {
-            var post = await _repository.GetPost();
+            var posts = await _repository.GetPosts();
+            var postsDTO = posts.Select(x => new PublicacionDTO
+            {
+                IdPublicacion = x.IdPublicacion,
+                Fecha = x.Fecha,
+                Descripcion = x.Descripcion,
+                Imagen = x.Imagen,
+                IdUsuario = x.IdUsuario
+            });
+            return Ok(postsDTO);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPost(int id)
+        {
+            var post = await _repository.GetPost(id);
+            var postDTO = new PublicacionDTO
+            {
+                IdPublicacion = post.IdPublicacion,
+                Fecha = post.Fecha,
+                Descripcion = post.Descripcion,
+                Imagen = post.Imagen,
+                IdUsuario = post.IdUsuario
+            };
+            return Ok(postDTO);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> InsertPost(PublicacionDTO publicacion)
+        {
+            var post = new Publicacion
+            {
+                Fecha = publicacion.Fecha,
+                Descripcion = publicacion.Descripcion,
+                Imagen = publicacion.Imagen,
+                IdUsuario = publicacion.IdUsuario
+            };
+            await _repository.InsertPost(post);
             return Ok(post);
         }
     }
