@@ -61,6 +61,9 @@ namespace SocialMedia.API.Controllers
         public async Task<IActionResult> InsertPost(PublicacionDTO publicacion)
         {
             var post = _mapper.Map<Publicacion>(publicacion);
+            await _repository.InsertPost(post);
+            return Ok(post);
+
 
             /*var post = new Publicacion
             {
@@ -69,8 +72,6 @@ namespace SocialMedia.API.Controllers
                 Imagen = publicacion.Imagen,
                 IdUsuario = publicacion.IdUsuario
             };*/
-            await _repository.InsertPost(post);
-            return Ok(post);
         }
     }
 }
