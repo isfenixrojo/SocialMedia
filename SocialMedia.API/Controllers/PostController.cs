@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SocialMedia.API.Response;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
@@ -29,7 +30,8 @@ namespace SocialMedia.API.Controllers
         public async Task<IActionResult> GetPosts()
         {
             var posts = await _repository.GetPosts();
-            var postsDTO = _mapper.Map<IEnumerable<PublicacionDTO>>(posts);
+            var postsDtos = _mapper.Map<IEnumerable<PublicacionDTO>>(posts);
+            var response = new ApiResponse<IEnumerable<PublicacionDTO>>(postsDtos);
             /*var postsDTO = posts.Select(x => new PublicacionDTO
             {
                 IdPublicacion = x.IdPublicacion,
@@ -38,14 +40,14 @@ namespace SocialMedia.API.Controllers
                 Imagen = x.Imagen,
                 IdUsuario = x.IdUsuario
             });*/
-            return Ok(postsDTO);
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(int id)
         {
             var post = await _repository.GetPost(id);
-            var postsDTO = _mapper.Map<PublicacionDTO>(post);
+            var postDTO = _mapper.Map<PublicacionDTO>(post);
             /*var postDTO = new PublicacionDTO
             {
                 IdPublicacion = post.IdPublicacion,
@@ -54,15 +56,18 @@ namespace SocialMedia.API.Controllers
                 Imagen = post.Imagen,
                 IdUsuario = post.IdUsuario
             };*/
-            return Ok(postsDTO);
+            var response = new ApiResponse<PublicacionDTO>(postDTO);
+            return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertPost(PublicacionDTO publicacion)
+        public async Task<IActionResult> InsertPost(PublicacionDTO publicacionDto)
         {
-            var post = _mapper.Map<Publicacion>(publicacion);
+            var post = _mapper.Map<Publicacion>(publicacionDto);
             await _repository.InsertPost(post);
-            return Ok(post);
+            publicacionDto = _mapper.Map<PublicacionDTO>(post);
+            var response = new ApiResponse<PublicacionDTO>(publicacionDto);
+            return Ok(response);
 
 
             /*var post = new Publicacion
@@ -72,6 +77,25 @@ namespace SocialMedia.API.Controllers
                 Imagen = publicacion.Imagen,
                 IdUsuario = publicacion.IdUsuario
             };*/
+        }
+
+
+        [HttpPut]
+        public async Task<IActionResult> UpdatePost(int id, PublicacionDTO publicacionDto)
+        {
+            var post = _mapper.Map<Publicacion>(publicacionDto);
+            post.IdPublicacion = id;
+
+            var result = await _repository.UpdatePost(post);
+            var response = new ApiResponse<bool>(result);
+            return Ok(response);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            var result = await _repository.DeletePost(id);
+            var response = new ApiResponse<bool>(result);
+            return Ok(response);
         }
     }
 }
