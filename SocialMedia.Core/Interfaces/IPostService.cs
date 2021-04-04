@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.Core.Interfaces
 {
-    public interface IPostRepository
+    public interface IPostService
     {
         Task<IEnumerable<Publicacion>> GetPosts();
         Task<Publicacion> GetPost(int id);

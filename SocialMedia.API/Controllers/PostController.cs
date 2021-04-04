@@ -16,20 +16,20 @@ namespace SocialMedia.API.Controllers
     [ApiController]
     public class PostController : ControllerBase
     {
-        private readonly IPostRepository _repository;
+        private readonly IPostService _repositoryService;
         private readonly IMapper _mapper;
 
 
-        public PostController(IPostRepository repository, IMapper mapper)
+        public PostController(IPostService repositoryService, IMapper mapper)
         {
-            _repository = repository;
+            _repositoryService = repositoryService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
-            var posts = await _repository.GetPosts();
+            var posts = await _repositoryService.GetPosts();
             var postsDtos = _mapper.Map<IEnumerable<PublicacionDTO>>(posts);
             var response = new ApiResponse<IEnumerable<PublicacionDTO>>(postsDtos);
             /*var postsDTO = posts.Select(x => new PublicacionDTO
@@ -46,7 +46,7 @@ namespace SocialMedia.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(int id)
         {
-            var post = await _repository.GetPost(id);
+            var post = await _repositoryService.GetPost(id);
             var postDTO = _mapper.Map<PublicacionDTO>(post);
             /*var postDTO = new PublicacionDTO
             {
@@ -64,7 +64,7 @@ namespace SocialMedia.API.Controllers
         public async Task<IActionResult> InsertPost(PublicacionDTO publicacionDto)
         {
             var post = _mapper.Map<Publicacion>(publicacionDto);
-            await _repository.InsertPost(post);
+            await _repositoryService.InsertPost(post);
             publicacionDto = _mapper.Map<PublicacionDTO>(post);
             var response = new ApiResponse<PublicacionDTO>(publicacionDto);
             return Ok(response);
@@ -86,14 +86,14 @@ namespace SocialMedia.API.Controllers
             var post = _mapper.Map<Publicacion>(publicacionDto);
             post.IdPublicacion = id;
 
-            var result = await _repository.UpdatePost(post);
+            var result = await _repositoryService.UpdatePost(post);
             var response = new ApiResponse<bool>(result);
             return Ok(response);
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
-            var result = await _repository.DeletePost(id);
+            var result = await _repositoryService.DeletePost(id);
             var response = new ApiResponse<bool>(result);
             return Ok(response);
         }
